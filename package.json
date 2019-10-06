@@ -1,0 +1,44 @@
+{
+  "name": "autosquash",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "ncc build",
+    "postbuild": "git add dist",
+    "check-prettier": "yarn run prettier --check",
+    "eslint": "eslint --max-warnings 0 \"./**/*.{js,ts}\"",
+    "format-prettier": "yarn run prettier --write",
+    "prettier": "prettier \"./**/*.{js,json,md,ts,yml}\"",
+    "pre-commit": "npm-run-all build --parallel check-prettier eslint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn pre-commit"
+    }
+  },
+  "devDependencies": {
+    "@actions/core": "^1.1.1",
+    "@actions/github": "^1.1.0",
+    "@octokit/rest": "^16.15.0",
+    "@octokit/webhooks": "^6.3.0",
+    "@types/node": "^10.0.3",
+    "@types/promise-retry": "^1.1.1",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.1",
+    "@zeit/ncc": "^0.20.5",
+    "eslint": "^6.5.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-config-xo": "^0.27.1",
+    "eslint-config-xo-typescript": "^0.19.0",
+    "eslint-import-resolver-typescript": "^1.1.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-sort-destructure-keys": "^1.3.3",
+    "eslint-plugin-typescript-sort-keys": "^0.4.0",
+    "eslint-plugin-unicorn": "^12.0.1",
+    "husky": "^3.0.7",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.18.2",
+    "promise-retry": "^1.1.1",
+    "typescript": "^3.6.3"
+  },
+  "private": true
+}

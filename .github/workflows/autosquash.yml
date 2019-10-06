@@ -1,0 +1,21 @@
+name: Autosquash
+on:
+  check_run:
+    types: [completed]
+  pull_request:
+    types: [closed, labeled]
+  pull_request_review:
+    types: [submitted]
+  status: {}
+
+jobs:
+  autosquash:
+    runs-on: ubuntu-18.04
+    name: Autosquash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Autosquash
+        uses: tibdex/autosquash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
