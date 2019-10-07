@@ -1,5 +1,5 @@
 name: Autosquash
-description: WIP
+description: Autosquash automatically updates pull requests with outdated checks and squash and merges pull requests matching all branch protections.
 runs:
   using: node12
   main: dist/index.js

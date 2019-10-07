@@ -52,8 +52,6 @@ By the time a pull request is ready to be merged, its Git history will often con
 
 The regular merge option doesn't help keeping `master` history clean, so we're only left with the squash and merge one.
 
-Don't worry, you will still be able to see the complete history of a squashed and merged pull request when going back to its GitHub page.
-
 ## Read more
 
 - [Two years of squash merge](https://blog.dnsimple.com/2019/01/two-years-of-squash-merge/)
