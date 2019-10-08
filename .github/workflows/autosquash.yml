@@ -16,6 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Autosquash
-        uses: tibdex/autosquash
+        uses: tibdex/autosquash@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # We can't use the built-in secrets.GITHUB_TOKEN yet because of this limitation:
+          # https://github.community/t5/GitHub-Actions/Triggering-a-new-workflow-from-another-workflow/td-p/31676
+          # In the meantime, use a personal access token with repo access.
+          # See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
+          GITHUB_TOKEN: ${{ secrets.AUTOSQUASH_TOKEN }}

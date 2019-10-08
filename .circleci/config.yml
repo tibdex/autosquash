@@ -1,0 +1,20 @@
+version: 2.1
+
+jobs:
+  check:
+    docker:
+      - image: circleci/node:12.4.0
+    steps:
+      - checkout
+      - run: yarn install
+      - run: yarn run build
+      - run: yarn run eslint
+
+workflows:
+  check:
+    jobs:
+      - check:
+          filters:
+            branches:
+              ignore:
+                - master

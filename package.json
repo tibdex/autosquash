@@ -7,12 +7,11 @@
     "check-prettier": "yarn run prettier --check",
     "eslint": "eslint --max-warnings 0 \"./**/*.{js,ts}\"",
     "format-prettier": "yarn run prettier --write",
-    "prettier": "prettier \"./**/*.{js,json,md,ts,yml}\"",
-    "pre-commit": "npm-run-all build --parallel check-prettier eslint"
+    "prettier": "prettier \"./**/*.{js,json,md,ts,yml}\""
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn pre-commit"
+      "pre-commit": "yarn run build"
     }
   },
   "devDependencies": {
@@ -35,7 +34,6 @@
     "eslint-plugin-typescript-sort-keys": "^0.4.0",
     "eslint-plugin-unicorn": "^12.0.1",
     "husky": "^3.0.7",
-    "npm-run-all": "^4.1.5",
     "prettier": "^1.18.2",
     "promise-retry": "^1.1.1",
     "typescript": "^3.6.3"
