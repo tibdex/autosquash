@@ -27,13 +27,13 @@ GitHub handles merge commits graciously. Indeed, it has a [web interface for res
 
 ![](assets/clean-merge.png)
 
-On the other hand, rebasing a pull request rewrites its Git history and GitHub doesn't like that. For instance, clicking on a notification about changes in a pull request with rewritten history will give you this:
+On the other hand, rebasing a pull request rewrites its Git history and GitHub doesn't like that. For instance, clicking on a notification concerning changes in a pull request with rewritten history will give you this:
 
 ![](assets/disappeared.png)
 
 The same thing will happen if you click on the file link of a [line comment](https://help.github.com/en/articles/commenting-on-a-pull-request#adding-line-comments-to-a-pull-request) but the pull request was rebased since the comment was posted.
 
-Another minor inconvenience with rebase and merge is that it's harder, when looking at the list of `master` commits, to see which commit comes from which pull request. You have to go to the commit page for GitHub to see which pull request had it. With regular merge or squash and merge, GitHub adds a pull request link to the commit title so the pull request is always a single click away from the list of commits.
+Another minor inconvenience with rebase and merge is that it's harder, when looking at the list of `master` commits, to know which commit comes from which pull request. You have to go to the actual commit page for GitHub to show you which pull request had it. With regular merge or squash and merge, GitHub adds a pull request link in the commit title so the pull request is always a single click away from the list of commits.
 
 `git rebase` and `git push --force` are useful when prototyping a feature locally. They also allow to create a pull request with a clean initial Git history. But once you ask for a review and start collaborating on a pull request, it's best to stop using these commands.
 
@@ -41,16 +41,16 @@ This eliminates the rebase and merge option and leaves us with the regular merge
 
 ## The pull request is the unit of change
 
-It's nice to make small and atomic commits inside a big pull requests but it's even nicer to make small and atomic pull requests.
+It's nice to make small and atomic commits inside a big pull request but it's even nicer to make small and atomic pull requests.
 
 The pull request is the unit of change:
 
 - it is reviewed as a whole. All the commits have to be reviewed and approved since it's their aggregated changes that will be applied to `master` when merged.
 - it is tested as a whole. CI providers only test the pull request's head commit. It's the only one guaranteed to not break the build and the tests. All the intermediate commits, as carefully crafted as they may be, might break `git bisect` if they land individually on `master`.
 
-By the time a pull request is ready to be merged, its Git history will often contain commits addressing review comments, fixing tests, typos, or code formatting. There is no point in making these commits part of `master` history. We would rather gather all the pull request commits into a single cohesive commit and put it on top of `master`. And that's where the Autosquash [WALL·E inspired](https://www.youtube.com/watch?v=WB8LrCWmGYw) logo and :package: emoji come from!
+By the time a pull request is ready to be merged, its Git history will often contain commits addressing review comments, fixing tests, typos, or code formatting. There is no point in making these commits part of `master`'s history. We would rather gather all the pull request's commits into a single cohesive commit and put it on top of `master`. And that's where the inspiration for the Autosquash [WALL·E inspired](https://www.youtube.com/watch?v=WB8LrCWmGYw) logo and :package: emoji comes from!
 
-The regular merge option doesn't help keeping `master` history clean, so we're only left with the squash and merge one.
+The regular merge option doesn't help keeping `master`'s history clean, so we're only left with the squash and merge one.
 
 ## Read more
 
