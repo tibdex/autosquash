@@ -9,6 +9,16 @@ jobs:
       - run: yarn install
       - run: yarn run build
       - run: yarn run eslint
+      - run:
+          name: Check action built
+          command: |
+            if output=$(git status --porcelain) && [ -z "$output" ]; then
+              echo "Git status clean"
+            else
+              git status
+              echo "Git status not clean. Did you forget to build the action before committing?"
+              exit 1
+            fi
 
 workflows:
   check:
