@@ -48,7 +48,7 @@ The pull request is the unit of change:
 - it is reviewed as a whole. All the commits have to be reviewed and approved since it's their aggregated changes that will be applied to `master` when merged.
 - it is tested as a whole. CI providers only test the pull request's head commit. It's the only one guaranteed to not break the build and the tests. All the intermediate commits, as carefully crafted as they may be, might break `git bisect` if they land individually on `master`.
 
-By the time a pull request is ready to be merged, its Git history will often contain commits addressing review comments, fixing tests, typos, or code formatting. There is no point in making these commits part of `master`'s history. We would rather gather all the pull request's commits into a single cohesive commit and put it on top of `master`. And that's where the inspiration for the Autosquash [WALL·E inspired](https://www.youtube.com/watch?v=WB8LrCWmGYw) logo and :package: emoji comes from!
+By the time a pull request is ready to be merged, its Git history will often contain commits addressing review comments, fixing tests, typos, or code formatting. There is no point in making these commits part of `master`'s history. We would rather gather all the pull request's commits into a single cohesive commit and put it on top of `master`. And that's where the Autosquash [WALL·E inspired](https://www.youtube.com/watch?v=WB8LrCWmGYw) logo and :package: emoji come from!
 
 The regular merge option doesn't help keeping `master`'s history clean, so we're only left with the squash and merge one.
 
