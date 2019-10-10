@@ -199,6 +199,7 @@ const merge = async ({
   github,
   owner,
   pullRequest: {
+    body,
     head: { sha },
     number: pull_number,
   },
@@ -212,6 +213,12 @@ const merge = async ({
   try {
     info("Attempting merge");
     await github.pulls.merge({
+      // Use the pull request body as the squashed commit title.
+      // The PR body often contains an interesting description
+      // and it's better to avoid the titles of intermediate
+      // commits such as "fix CI" or "formatting" being
+      // part of the squashed commit message.
+      commit_message: body,
       merge_method: "squash",
       owner,
       pull_number,
