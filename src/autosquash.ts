@@ -229,7 +229,7 @@ const fetchPullRequestCoAuthors = async ({
         // Ignore merge commits.
         parents.length === 1 &&
         // Ignore commits with author detached from GitHub account.
-        author &&
+        author !== null &&
         // Ignore pull request creator (already main author of the squashed commit).
         author.login !== pullRequestCreator &&
         // Ignore bots.
@@ -244,7 +244,7 @@ const fetchPullRequestCoAuthors = async ({
       }) => {
         if (!authorUsernames.has(username)) {
           authorUsernames.add(username);
-          coAuthors.push({ name, email });
+          coAuthors.push({ email, name });
         }
       },
     );
@@ -274,7 +274,7 @@ const getSquashedCommitMessage = ({
   const coAuthorLines = coAuthors.map(
     ({ email, name }) => `Co-authored-by: ${name} <${email}>`,
   );
-  return [body, , ...coAuthorLines].join("\n");
+  return [body, "", ...coAuthorLines].join("\n");
 };
 
 const merge = async ({
@@ -297,7 +297,7 @@ const merge = async ({
     github,
     owner,
     pullRequestCreator,
-    pullRequestNumber: pullRequestNumber,
+    pullRequestNumber,
     repo,
   });
   try {
