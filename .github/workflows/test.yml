@@ -1,0 +1,30 @@
+name: Test
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    name: Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install
+        run: yarn install
+      - name: Build
+        run: yarn run build
+      - name: ESLint
+        run: yarn run eslint
+      - name: Prettier
+        run: yarn run check-prettier
+      - name: Check action built
+        run: |
+          if output=$(git status --porcelain) && [ -z "$output" ]; then
+            echo "Git status clean"
+          else
+            git status
+            echo "Git status not clean. Did you forget to build the action before committing?"
+            exit 1
+          fi
