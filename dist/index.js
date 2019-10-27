@@ -3512,15 +3512,19 @@ const fetchPullRequest = async ({ github, owner, pullRequestNumber, repo, }) => 
         }
     }, { minTimeout: 250 });
 };
-const handlePullRequests = async ({ github, handle, owner, pullRequestNumbers, repo, }) => Promise.all(pullRequestNumbers.map(async (pullRequestNumber) => Object(core.group)(`Handling ${getPullRequestId(pullRequestNumber)}`, async () => {
-    const pullRequest = await fetchPullRequest({
-        github,
-        owner,
-        pullRequestNumber,
-        repo,
-    });
-    await handle(pullRequest);
-})));
+const handlePullRequests = async ({ github, handle, owner, pullRequestNumbers, repo, }) => {
+    for (const pullRequestNumber of pullRequestNumbers) {
+        await Object(core.group)(`Handling ${getPullRequestId(pullRequestNumber)}`, async () => {
+            const pullRequest = await fetchPullRequest({
+                github,
+                owner,
+                pullRequestNumber,
+                repo,
+            });
+            await handle(pullRequest);
+        });
+    }
+};
 const handleSearchedPullRequests = async ({ github, handle, owner, query, repo, }) => {
     const fullQuery = `is:pr is:open label:"${autosquashLabel}" repo:${owner}/${repo} ${query}`;
     const { data: { incomplete_results, items }, } = await github.search.issuesAndPullRequests({
@@ -3531,17 +3535,19 @@ const handleSearchedPullRequests = async ({ github, handle, owner, query, repo, 
     if (incomplete_results) {
         Object(core.warning)(`Search has incomplete results, only the first ${items.length} items will be handled`);
     }
-    await Promise.all(items.map(async (item) => Object(core.group)(`Handling searched pull request ${getPullRequestId(item.number)}`, async () => {
-        if (isCandidate(item)) {
-            const pullRequest = await fetchPullRequest({
-                github,
-                owner,
-                pullRequestNumber: item.number,
-                repo,
-            });
-            await handle(pullRequest);
-        }
-    })));
+    for (const item of items) {
+        await Object(core.group)(`Handling searched pull request ${getPullRequestId(item.number)}`, async () => {
+            if (isCandidate(item)) {
+                const pullRequest = await fetchPullRequest({
+                    github,
+                    owner,
+                    pullRequestNumber: item.number,
+                    repo,
+                });
+                await handle(pullRequest);
+            }
+        });
+    }
 };
 const merge = async ({ github, owner, pullRequest: { body, head: { sha }, number: pull_number, }, repo, }) => {
     try {
