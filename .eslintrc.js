@@ -30,6 +30,8 @@ module.exports = {
     "arrow-body-style": "error",
     // Forbid function declarations
     "func-style": ["error", "expression", { allowArrowFunctions: true }],
+    // It's fine to use await in for loops instead of Promise.all to execute promises sequentially.
+    "no-await-in-loop": "off",
     "no-console": "error",
     // TypeScript already takes care of that. See https://github.com/bradzacher/eslint-plugin-typescript/issues/110.
     "no-undef": "off",

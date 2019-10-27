@@ -138,20 +138,19 @@ const handlePullRequests = async ({
   owner: string;
   pullRequestNumbers: number[];
   repo: string;
-}) =>
-  Promise.all(
-    pullRequestNumbers.map(async pullRequestNumber =>
-      group(`Handling ${getPullRequestId(pullRequestNumber)}`, async () => {
-        const pullRequest = await fetchPullRequest({
-          github,
-          owner,
-          pullRequestNumber,
-          repo,
-        });
-        await handle(pullRequest);
-      }),
-    ),
-  );
+}) => {
+  for (const pullRequestNumber of pullRequestNumbers) {
+    await group(`Handling ${getPullRequestId(pullRequestNumber)}`, async () => {
+      const pullRequest = await fetchPullRequest({
+        github,
+        owner,
+        pullRequestNumber,
+        repo,
+      });
+      await handle(pullRequest);
+    });
+  }
+};
 
 const handleSearchedPullRequests = async ({
   github,
@@ -180,24 +179,22 @@ const handleSearchedPullRequests = async ({
     );
   }
 
-  await Promise.all(
-    items.map(async item =>
-      group(
-        `Handling searched pull request ${getPullRequestId(item.number)}`,
-        async () => {
-          if (isCandidate(item)) {
-            const pullRequest = await fetchPullRequest({
-              github,
-              owner,
-              pullRequestNumber: item.number,
-              repo,
-            });
-            await handle(pullRequest);
-          }
-        },
-      ),
-    ),
-  );
+  for (const item of items) {
+    await group(
+      `Handling searched pull request ${getPullRequestId(item.number)}`,
+      async () => {
+        if (isCandidate(item)) {
+          const pullRequest = await fetchPullRequest({
+            github,
+            owner,
+            pullRequestNumber: item.number,
+            repo,
+          });
+          await handle(pullRequest);
+        }
+      },
+    );
+  }
 };
 
 const fetchPullRequestCoAuthors = async ({
