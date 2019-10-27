@@ -3543,19 +3543,63 @@ const handleSearchedPullRequests = async ({ github, handle, owner, query, repo, 
         }
     })));
 };
-const merge = async ({ github, owner, pullRequest: { body, head: { sha }, number: pull_number, }, repo, }) => {
+const fetchPullRequestCoAuthors = async ({ github, owner, pullRequestCreator, pullRequestNumber, repo, }) => {
+    const options = github.pulls.listCommits.endpoint.merge({
+        number: pullRequestNumber,
+        owner,
+        repo,
+    });
+    const commits = await github.paginate(options);
+    const authorUsernames = new Set();
+    const coAuthors = [];
+    commits
+        .filter(({ author, parents }) => 
+    // Ignore merge commits.
+    parents.length === 1 &&
+        // Ignore commits with author detached from GitHub account.
+        author &&
+        // Ignore pull request creator (already main author of the squashed commit).
+        author.login !== pullRequestCreator &&
+        // Ignore bots.
+        author.type === "User")
+        .forEach(({ author: { login: username }, commit: { author: { email, name }, }, }) => {
+        if (!authorUsernames.has(username)) {
+            authorUsernames.add(username);
+            coAuthors.push({ name, email });
+        }
+    });
+    return coAuthors;
+};
+// Use the pull request body as the squashed commit message.
+// Indeed, the PR body often contains an interesting description
+// and it's better to avoid the titles of intermediate
+// commits such as "fix CI" or "formatting" being
+// part of the squashed commit message.
+// Also add the authors of commits in the pull request
+// as co-authors of the squashed commit.
+// See https://help.github.com/en/github/committing-changes-to-your-project/creating-a-commit-with-multiple-authors#creating-co-authored-commits-on-the-command-line.
+const getSquashedCommitMessage = ({ body, coAuthors, }) => {
+    if (coAuthors.length === 0) {
+        return body;
+    }
+    const coAuthorLines = coAuthors.map(({ email, name }) => `Co-authored-by: ${name} <${email}>`);
+    return [body, , ...coAuthorLines].join("\n");
+};
+const merge = async ({ github, owner, pullRequest: { body, head: { sha }, number: pullRequestNumber, user: { login: pullRequestCreator }, }, repo, }) => {
+    const coAuthors = await fetchPullRequestCoAuthors({
+        github,
+        owner,
+        pullRequestCreator,
+        pullRequestNumber: pullRequestNumber,
+        repo,
+    });
     try {
         Object(core.info)("Attempting merge");
         await github.pulls.merge({
-            // Use the pull request body as the squashed commit title.
-            // The PR body often contains an interesting description
-            // and it's better to avoid the titles of intermediate
-            // commits such as "fix CI" or "formatting" being
-            // part of the squashed commit message.
-            commit_message: body,
+            commit_message: getSquashedCommitMessage({ body, coAuthors }),
             merge_method: "squash",
             owner,
-            pull_number,
+            pull_number: pullRequestNumber,
             repo,
             sha,
         });
