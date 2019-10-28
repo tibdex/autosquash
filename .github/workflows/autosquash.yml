@@ -24,11 +24,10 @@ on:
 
 jobs:
   autosquash:
-    runs-on: ubuntu-18.04
     name: Autosquash
+    runs-on: ubuntu-18.04
     steps:
-      - name: Autosquash
-        uses: tibdex/autosquash@v1.0.1
+      - uses: tibdex/autosquash@v1
         env:
           # We can't use the built-in secrets.GITHUB_TOKEN yet because of this limitation:
           # https://github.community/t5/GitHub-Actions/Triggering-a-new-workflow-from-another-workflow/td-p/31676
