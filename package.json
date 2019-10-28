@@ -4,6 +4,7 @@
   "license": "MIT",
   "files": [
     "action.yml",
+    "assets",
     "dist"
   ],
   "main": "dist/index.js",
