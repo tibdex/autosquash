@@ -1,24 +1,18 @@
 {
   "name": "autosquash",
   "version": "1.0.1",
-  "private": true,
   "license": "MIT",
   "files": [
-    "dist",
-    "action.yml"
+    "action.yml",
+    "dist"
   ],
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
   "scripts": {
     "build": "ncc build src/index.ts --minify --v8-cache",
     "check-prettier": "yarn run prettier --check",
-    "eslint": "eslint --max-warnings 0 \"./**/*.{js,ts}\"",
+    "eslint": "eslint --ignore-path .gitignore --max-warnings 0 \"./**/*.{js,ts}\"",
     "format-prettier": "yarn run prettier --write",
-    "prettier": "prettier \"./**/*.{js,json,md,ts,yml}\"",
-    "start": "ncc build src/index.ts --watch"
-  },
-  "prettier": {
-    "trailingComma": "all"
+    "prettier": "prettier --ignore-path .gitignore \"./**/*.{js,json,md,ts,yml}\""
   },
   "devDependencies": {
     "@actions/core": "^1.1.1",
