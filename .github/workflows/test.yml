@@ -6,11 +6,10 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
     name: Test
+    runs-on: ubuntu-18.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
+      - uses: actions/checkout@v1
       - name: Install
         run: yarn install
       - name: Build
@@ -19,12 +18,3 @@ jobs:
         run: yarn run eslint
       - name: Prettier
         run: yarn run check-prettier
-      - name: Check action built
-        run: |
-          if output=$(git status --porcelain) && [ -z "$output" ]; then
-            echo "Git status clean"
-          else
-            git status
-            echo "Git status not clean. Did you forget to build the action before committing?"
-            exit 1
-          fi
