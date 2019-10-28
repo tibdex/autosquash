@@ -211,8 +211,8 @@ const fetchPullRequestCoAuthors = async ({
   repo: string;
 }): Promise<Author[]> => {
   const options = github.pulls.listCommits.endpoint.merge({
-    number: pullRequestNumber,
     owner,
+    pull_number: pullRequestNumber,
     repo,
   });
   const commits: PullsListCommitsResponse = await github.paginate(options);
