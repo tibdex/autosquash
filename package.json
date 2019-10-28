@@ -1,18 +1,24 @@
 {
   "name": "autosquash",
-  "main": "src/index.ts",
+  "version": "1.0.1",
+  "private": true,
+  "license": "MIT",
+  "files": [
+    "dist",
+    "action.yml"
+  ],
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "ncc build",
-    "postbuild": "git add dist",
+    "build": "ncc build src/index.ts --minify --v8-cache",
     "check-prettier": "yarn run prettier --check",
     "eslint": "eslint --max-warnings 0 \"./**/*.{js,ts}\"",
     "format-prettier": "yarn run prettier --write",
-    "prettier": "prettier \"./**/*.{js,json,md,ts,yml}\""
+    "prettier": "prettier \"./**/*.{js,json,md,ts,yml}\"",
+    "start": "ncc build src/index.ts --watch"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn run build"
-    }
+  "prettier": {
+    "trailingComma": "all"
   },
   "devDependencies": {
     "@actions/core": "^1.1.1",
@@ -37,6 +43,5 @@
     "prettier": "^1.18.2",
     "promise-retry": "^1.1.1",
     "typescript": "^3.6.3"
-  },
-  "private": true
+  }
 }
