@@ -1,8 +1,9 @@
 {
   "name": "autosquash",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "MIT",
   "files": [
+    ".github/workflows/autosquash.yml",
     "action.yml",
     "assets",
     "dist"
