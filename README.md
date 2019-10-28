@@ -9,8 +9,10 @@ Autosquash is a simple and opinionated [JavaScript GitHub action](https://help.g
 
 Pull requests with the `autosquash` label will be:
 
-- [updated](https://developer.github.com/changes/2019-05-29-update-branch-api/) when new commits land on their base branch, making their status checks outdated.
-- [squashed and merged](https://help.github.com/en/articles/about-pull-request-merges#squash-and-merge-your-pull-request-commits) once all the branch protections are respected.
+- [updated](https://developer.github.com/changes/2019-05-29-update-branch-api/) when new commits land on their base branch and make their status checks outdated.
+- [squashed and merged](https://help.github.com/en/articles/about-pull-request-merges#squash-and-merge-your-pull-request-commits) once all the branch protections are respected:
+  - The description of the pull request will become the message of the squashed commit.
+  - The creator of the pull request will be the main author of the squashed commit. If other people authored commits in the pull request, they will be added as [co-authors](https://help.github.com/en/github/committing-changes-to-your-project/creating-a-commit-with-multiple-authors) of the squashed commit.
 
 # Usage
 
