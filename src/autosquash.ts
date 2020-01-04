@@ -256,7 +256,10 @@ const fetchPullRequestCoAuthors = async ({
 // part of the squashed commit message.
 // Also add the authors of commits in the pull request
 // as co-authors of the squashed commit.
-// See https://help.github.com/en/github/committing-changes-to-your-project/creating-a-commit-with-multiple-authors#creating-co-authored-commits-on-the-command-line.
+// See https://github.blog/changelog/2019-12-19-improved-attribution-when-squashing-commits/.
+// GitHub only automatically appends the co-author lines when the squashed commit message is
+// left untouched to be the list of the PR's commits title and message.
+// But since we change it to be the PR body, we have to append these lines ourself.
 const getSquashedCommitMessage = ({
   body,
   coAuthors,
