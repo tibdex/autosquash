@@ -10,6 +10,7 @@ import {
 import { PullsGetResponse, PullsListCommitsResponse } from "@octokit/rest";
 import * as assert from "assert";
 import promiseRetry from "promise-retry";
+import { debug } from "util";
 
 /**
  * See https://developer.github.com/v4/enum/mergestatestatus/
@@ -492,6 +493,8 @@ const autosquash = async ({
         repo,
       });
     }
+  } else {
+    throw new Error(`Can't deal with this event: ${JSON.stringify(context)}`);
   }
 };
 

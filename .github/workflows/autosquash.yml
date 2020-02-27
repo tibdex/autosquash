@@ -1,5 +1,8 @@
 name: Autosquash
 on:
+  schedule:
+    # checks runs every minute
+    - cron:  '* * * * *'
   check_run:
     types:
       # Check runs completing successfully can unblock the
