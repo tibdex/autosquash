@@ -249,6 +249,18 @@ const fetchPullRequestCoAuthors = async ({
   return coAuthors;
 };
 
+// Using standard horizontal rule formats as defined in
+// https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#horizontal-rule.
+const horizontalRuleExpr = /[\r\n][\t ]*[\r\n](?:-{3,}|\*{3,}|_{3,})/m;
+const filterBody = (body: string): string => {
+  const firstHorizontalRule = horizontalRuleExpr.exec(body);
+  if (firstHorizontalRule === null) {
+    return body;
+  }
+
+  return body.slice(0, firstHorizontalRule.index);
+};
+
 // Use the pull request body as the squashed commit message.
 // Indeed, the PR body often contains an interesting description
 // and it's better to avoid the titles of intermediate
@@ -267,14 +279,15 @@ const getSquashedCommitMessage = ({
   body: string;
   coAuthors: Author[];
 }): string => {
+  const prBody = filterBody(body);
   if (coAuthors.length === 0) {
-    return body;
+    return prBody;
   }
 
   const coAuthorLines = coAuthors.map(
     ({ email, name }) => `Co-authored-by: ${name} <${email}>`,
   );
-  return [body, "", ...coAuthorLines].join("\n");
+  return [prBody, "", ...coAuthorLines].join("\n");
 };
 
 const merge = async ({
