@@ -12,13 +12,15 @@
     "check-prettier": "yarn run prettier --check",
     "eslint": "eslint --ignore-path .gitignore --max-warnings 0 \"./**/*.{js,ts}\"",
     "format-prettier": "yarn run prettier --write",
-    "prettier": "prettier --ignore-path .gitignore \"./**/*.{js,json,md,ts,yml}\""
+    "prettier": "prettier --ignore-path .gitignore \"./**/*.{js,json,md,ts,yml}\"",
+    "test": "jest"
   },
   "devDependencies": {
     "@actions/core": "^1.1.1",
     "@actions/github": "^1.1.0",
     "@octokit/rest": "^16.15.0",
     "@octokit/webhooks": "^6.3.0",
+    "@types/jest": "^25.2.1",
     "@types/node": "^10.0.3",
     "@types/promise-retry": "^1.1.1",
     "@typescript-eslint/eslint-plugin": "^2.3.1",
@@ -33,8 +35,10 @@
     "eslint-plugin-sort-destructure-keys": "^1.3.3",
     "eslint-plugin-typescript-sort-keys": "^0.4.0",
     "eslint-plugin-unicorn": "^12.0.1",
+    "jest": "^25.3.0",
     "prettier": "^1.18.2",
     "promise-retry": "^1.1.1",
-    "typescript": "^3.6.3"
+    "ts-jest": "^25.3.1",
+    "typescript": "^3.8.3"
   }
 }

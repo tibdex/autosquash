@@ -508,4 +508,4 @@ const autosquash = async ({
   }
 };
 
-export { autosquash };
+export { autosquash, filterBody };
