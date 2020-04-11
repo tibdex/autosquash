@@ -1,13 +1,13 @@
 import { error as logError, info, warning, group } from "@actions/core";
-import { GitHub } from "@actions/github";
-import { Context } from "@actions/github/lib/context";
-import {
+import type { GitHub } from "@actions/github";
+import type { Context } from "@actions/github/lib/context";
+import type {
   WebhookPayloadCheckRun,
   WebhookPayloadPullRequest,
   WebhookPayloadPullRequestReview,
   WebhookPayloadStatus,
 } from "@octokit/webhooks";
-import { PullsGetResponse, PullsListCommitsResponse } from "@octokit/rest";
+import type { Octokit } from "@octokit/rest";
 import * as assert from "assert";
 import promiseRetry from "promise-retry";
 
@@ -79,7 +79,7 @@ const isCandidateWithMergeableState = (
     closed_at,
     labels,
     mergeable_state: actualMergeableState,
-  }: PullsGetResponse,
+  }: Octokit.PullsGetResponse,
   expectedMergeableState: MergeableState[],
 ): boolean => {
   if (!isCandidate({ closed_at, labels })) {
@@ -105,7 +105,7 @@ const fetchPullRequest = async ({
 }) => {
   info("Fetching pull request details");
   return promiseRetry(
-    async retry => {
+    async (retry) => {
       try {
         const { data: pullRequest } = await github.pulls.get({
           owner,
@@ -134,7 +134,7 @@ const handlePullRequests = async ({
   repo,
 }: {
   github: GitHub;
-  handle: (pullRequest: PullsGetResponse) => Promise<unknown>;
+  handle: (pullRequest: Octokit.PullsGetResponse) => Promise<unknown>;
   owner: string;
   pullRequestNumbers: number[];
   repo: string;
@@ -160,7 +160,7 @@ const handleSearchedPullRequests = async ({
   repo,
 }: {
   github: GitHub;
-  handle: (pullRequest: PullsGetResponse) => Promise<unknown>;
+  handle: (pullRequest: Octokit.PullsGetResponse) => Promise<unknown>;
   owner: string;
   query: string;
   repo: string;
@@ -215,7 +215,9 @@ const fetchPullRequestCoAuthors = async ({
     pull_number: pullRequestNumber,
     repo,
   });
-  const commits: PullsListCommitsResponse = await github.paginate(options);
+  const commits: Octokit.PullsListCommitsResponse = await github.paginate(
+    options,
+  );
 
   const authorUsernames = new Set<string>();
   const coAuthors: Author[] = [];
@@ -303,7 +305,7 @@ const merge = async ({
 }: {
   github: GitHub;
   owner: string;
-  pullRequest: PullsGetResponse;
+  pullRequest: Octokit.PullsGetResponse;
   repo: string;
 }) => {
   const coAuthors = await fetchPullRequestCoAuthors({
@@ -340,7 +342,7 @@ const update = async ({
 }: {
   github: GitHub;
   owner: string;
-  pullRequest: PullsGetResponse;
+  pullRequest: Octokit.PullsGetResponse;
   repo: string;
 }) => {
   try {
