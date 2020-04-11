@@ -10,6 +10,7 @@ import type {
 import type { Octokit } from "@octokit/rest";
 import * as assert from "assert";
 import promiseRetry from "promise-retry";
+import { filterBody } from "./filter-body";
 
 /**
  * See https://developer.github.com/v4/enum/mergestatestatus/
@@ -251,25 +252,12 @@ const fetchPullRequestCoAuthors = async ({
   return coAuthors;
 };
 
-// Using standard horizontal rule formats as defined in
-// https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet#horizontal-rule.
-const horizontalRuleExpr = /[\r\n][\t ]*[\r\n](?:-{3,}|\*{3,}|_{3,})/m;
-const filterBody = (body: string): string => {
-  const firstHorizontalRule = horizontalRuleExpr.exec(body);
-  if (firstHorizontalRule === null) {
-    return body;
-  }
-
-  return body.slice(0, firstHorizontalRule.index);
-};
-
-// Use the pull request body as the squashed commit message.
+// Use the pull request body, up to its first thematic break, as the squashed commit message.
 // Indeed, the PR body often contains an interesting description
 // and it's better to avoid the titles of intermediate
 // commits such as "fix CI" or "formatting" being
 // part of the squashed commit message.
-// Also add the authors of commits in the pull request
-// as co-authors of the squashed commit.
+// Also add the authors of commits in the pull request as co-authors of the squashed commit.
 // See https://github.blog/changelog/2019-12-19-improved-attribution-when-squashing-commits/.
 // GitHub only automatically appends the co-author lines when the squashed commit message is
 // left untouched to be the list of the PR's commits title and message.
@@ -282,6 +270,7 @@ const getSquashedCommitMessage = ({
   coAuthors: Author[];
 }): string => {
   const prBody = filterBody(body);
+
   if (coAuthors.length === 0) {
     return prBody;
   }
@@ -510,4 +499,4 @@ const autosquash = async ({
   }
 };
 
-export { autosquash, filterBody };
+export { autosquash };
