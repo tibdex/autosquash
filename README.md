@@ -11,7 +11,7 @@ Pull requests with the `autosquash` label will be:
 
 - [updated](https://developer.github.com/changes/2019-05-29-update-branch-api/) when new commits land on their base branch and make their status checks outdated.
 - [squashed and merged](https://help.github.com/en/articles/about-pull-request-merges#squash-and-merge-your-pull-request-commits) once all the branch protections are respected:
-  - The description of the pull request will become the message of the squashed commit.
+  - The description of the pull request, up to its first [thematic break](https://github.github.com/gfm/#thematic-breaks), will become the message of the squashed commit.
   - The creator of the pull request will be the main author of the squashed commit. If other people authored commits in the pull request, they will be added as [co-authors](https://github.blog/changelog/2019-12-19-improved-attribution-when-squashing-commits/) of the squashed commit.
 
 # Usage
