@@ -288,6 +288,7 @@ const merge = async ({
     body,
     head: { sha },
     number: pullRequestNumber,
+    title,
     user: { login: pullRequestCreator },
   },
   repo,
@@ -308,6 +309,7 @@ const merge = async ({
     info("Attempting merge");
     await github.pulls.merge({
       commit_message: getSquashedCommitMessage({ body, coAuthors }),
+      commit_title: title,
       merge_method: "squash",
       owner,
       pull_number: pullRequestNumber,
