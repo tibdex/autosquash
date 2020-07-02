@@ -21,7 +21,7 @@ Pull requests with the `autosquash` label will be:
 
 # Why squash and merge?
 
-Autosquash favors squash and merge over regular merge or rebase and merge for the follwing reasons:
+Autosquash favors squash and merge over regular merge or rebase and merge for the following reasons:
 
 ## GitHub is merge oriented rather than rebase oriented
 
