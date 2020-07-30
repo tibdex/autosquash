@@ -448,7 +448,7 @@ const autosquash = async ({
           : merge;
         await handle({ github, owner, pullRequest, repo });
       }
-    } else if (payload.action = "synchronize") {
+    } else if (payload.action === "synchronize") {
       const pullRequestNumber = payload.pull_request.number;
       info(`Consider merging ${getPullRequestId(pullRequestNumber)}`);
       const pullRequest = await fetchPullRequest({
@@ -457,7 +457,7 @@ const autosquash = async ({
         pullRequestNumber,
         repo,
       });
-      
+
       if (
         isCandidateWithMergeableState(pullRequest, potentialMergeableStates)
       ) {
