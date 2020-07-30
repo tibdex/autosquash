@@ -1,5 +1,7 @@
 name: Autosquash
 on:
+  # Autosquash will only consider merges for the events
+  # listed in this workflow
   check_run:
     types:
       # Check runs completing successfully can unblock the
@@ -13,6 +15,8 @@ on:
       # Adding the autosquash label to a pull request can
       # trigger an update or a merge.
       - labeled
+      # Updating a PR can make the pull request mergeable.
+      - synchronize
   pull_request_review:
     types:
       # Review approvals can unblock the pull request and
