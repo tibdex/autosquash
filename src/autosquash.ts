@@ -448,6 +448,26 @@ const autosquash = async ({
           : merge;
         await handle({ github, owner, pullRequest, repo });
       }
+    } else if (payload.action = "synchronize") {
+      const pullRequestNumber = payload.pull_request.number;
+      info(`Consider merging ${getPullRequestId(pullRequestNumber)}`);
+      const pullRequest = await fetchPullRequest({
+        github,
+        owner,
+        pullRequestNumber,
+        repo,
+      });
+      
+      if (
+        isCandidateWithMergeableState(pullRequest, potentialMergeableStates)
+      ) {
+        await merge({
+          github,
+          owner,
+          pullRequest,
+          repo,
+        });
+      }
     }
   } else if (eventName === "pull_request_review") {
     const payload = context.payload as WebhookPayloadPullRequestReview;
