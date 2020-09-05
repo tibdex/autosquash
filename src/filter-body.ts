@@ -6,7 +6,8 @@ import { parsers } from "prettier/parser-markdown";
 // The simplest is to use a good Markdown parser such as the one used by Prettier.
 const filterBody = (body: string): string => {
   const trimmedBody = body.trim();
-  // @ts-ignore
+  // The function actually does not need 3 parameters, it can be called with a single one.
+  // @ts-expect-error
   const { children } = parsers.markdown.parse(trimmedBody);
   const firstThematicBreak = children.find(
     ({ type }: { type: string }) => type === "thematicBreak",

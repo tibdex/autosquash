@@ -1,13 +1,11 @@
 import { error as logError, info, warning, group } from "@actions/core";
-import type { GitHub } from "@actions/github";
+import { GitHub } from "@actions/github/lib/utils";
 import type { Context } from "@actions/github/lib/context";
+import type { EventPayloads } from "@octokit/webhooks";
 import type {
-  WebhookPayloadCheckRun,
-  WebhookPayloadPullRequest,
-  WebhookPayloadPullRequestReview,
-  WebhookPayloadStatus,
-} from "@octokit/webhooks";
-import type { Octokit } from "@octokit/rest";
+  PullsGetResponseData,
+  PullsListCommitsResponseData,
+} from "@octokit/types";
 import * as assert from "assert";
 import promiseRetry from "promise-retry";
 import { filterBody } from "./filter-body";
@@ -25,10 +23,10 @@ type MergeableState =
   | "unstable";
 
 type WebhookPayload =
-  | WebhookPayloadCheckRun
-  | WebhookPayloadPullRequest
-  | WebhookPayloadPullRequestReview
-  | WebhookPayloadStatus;
+  | EventPayloads.WebhookPayloadCheckRun
+  | EventPayloads.WebhookPayloadPullRequest
+  | EventPayloads.WebhookPayloadPullRequestReview
+  | EventPayloads.WebhookPayloadStatus;
 
 type Author = {
   email: string;
@@ -80,7 +78,7 @@ const isCandidateWithMergeableState = (
     closed_at,
     labels,
     mergeable_state: actualMergeableState,
-  }: Octokit.PullsGetResponse,
+  }: PullsGetResponseData,
   expectedMergeableState: MergeableState[],
 ): boolean => {
   if (!isCandidate({ closed_at, labels })) {
@@ -99,7 +97,7 @@ const fetchPullRequest = async ({
   pullRequestNumber,
   repo,
 }: {
-  github: GitHub;
+  github: InstanceType<typeof GitHub>;
   owner: string;
   pullRequestNumber: number;
   repo: string;
@@ -134,8 +132,8 @@ const handlePullRequests = async ({
   pullRequestNumbers,
   repo,
 }: {
-  github: GitHub;
-  handle: (pullRequest: Octokit.PullsGetResponse) => Promise<unknown>;
+  github: InstanceType<typeof GitHub>;
+  handle: (pullRequest: PullsGetResponseData) => Promise<unknown>;
   owner: string;
   pullRequestNumbers: number[];
   repo: string;
@@ -160,8 +158,8 @@ const handleSearchedPullRequests = async ({
   query,
   repo,
 }: {
-  github: GitHub;
-  handle: (pullRequest: Octokit.PullsGetResponse) => Promise<unknown>;
+  github: InstanceType<typeof GitHub>;
+  handle: (pullRequest: PullsGetResponseData) => Promise<unknown>;
   owner: string;
   query: string;
   repo: string;
@@ -205,7 +203,7 @@ const fetchPullRequestCoAuthors = async ({
   pullRequestNumber,
   repo,
 }: {
-  github: GitHub;
+  github: InstanceType<typeof GitHub>;
   owner: string;
   pullRequestCreator: string;
   pullRequestNumber: number;
@@ -216,9 +214,7 @@ const fetchPullRequestCoAuthors = async ({
     pull_number: pullRequestNumber,
     repo,
   });
-  const commits: Octokit.PullsListCommitsResponse = await github.paginate(
-    options,
-  );
+  const commits: PullsListCommitsResponseData = await github.paginate(options);
 
   const authorUsernames = new Set<string>();
   const coAuthors: Author[] = [];
@@ -293,9 +289,9 @@ const merge = async ({
   },
   repo,
 }: {
-  github: GitHub;
+  github: InstanceType<typeof GitHub>;
   owner: string;
-  pullRequest: Octokit.PullsGetResponse;
+  pullRequest: PullsGetResponseData;
   repo: string;
 }) => {
   const coAuthors = await fetchPullRequestCoAuthors({
@@ -319,7 +315,7 @@ const merge = async ({
     });
     info("Merged!");
   } catch (error) {
-    logError(`Merge failed: ${error.message}`);
+    logError(error);
   }
 };
 
@@ -332,9 +328,9 @@ const update = async ({
   },
   repo,
 }: {
-  github: GitHub;
+  github: InstanceType<typeof GitHub>;
   owner: string;
-  pullRequest: Octokit.PullsGetResponse;
+  pullRequest: PullsGetResponseData;
   repo: string;
 }) => {
   try {
@@ -347,7 +343,7 @@ const update = async ({
     });
     info("Updated!");
   } catch (error) {
-    logError(`Update failed: ${error.message}`);
+    logError(error);
   }
 };
 
@@ -356,7 +352,7 @@ const autosquash = async ({
   github,
 }: {
   context: Context;
-  github: GitHub;
+  github: InstanceType<typeof GitHub>;
 }) => {
   const { eventName } = context;
   const {
@@ -367,12 +363,18 @@ const autosquash = async ({
   } = context.payload as WebhookPayload;
 
   if (eventName === "check_run") {
-    const payload = context.payload as WebhookPayloadCheckRun;
+    const payload = context.payload as EventPayloads.WebhookPayloadCheckRun;
     if (payload.action === "completed") {
       const pullRequestNumbers = payload.check_run.pull_requests.map(
         ({ number }) => number,
       );
-      info(`Consider merging ${pullRequestNumbers.map(getPullRequestId)}`);
+      info(
+        `Consider merging ${JSON.stringify(
+          pullRequestNumbers.map((pullRequestNumber) =>
+            getPullRequestId(pullRequestNumber),
+          ),
+        )}`,
+      );
       await handlePullRequests({
         github,
         async handle(pullRequest) {
@@ -393,7 +395,7 @@ const autosquash = async ({
       });
     }
   } else if (eventName === "pull_request") {
-    const payload = context.payload as WebhookPayloadPullRequest;
+    const payload = context.payload as EventPayloads.WebhookPayloadPullRequest;
     if (payload.action === "closed" && payload.pull_request.merged) {
       const {
         pull_request: {
@@ -425,7 +427,7 @@ const autosquash = async ({
     } else if (
       payload.action === "labeled" &&
       // The payload has a label property when the action is "labeled".
-      // @ts-ignore
+      // @ts-expect-error
       payload.label.name === autosquashLabel
     ) {
       info(`Consider merging or updating ${getPullRequestId(payload.number)}`);
@@ -450,7 +452,7 @@ const autosquash = async ({
       }
     }
   } else if (eventName === "pull_request_review") {
-    const payload = context.payload as WebhookPayloadPullRequestReview;
+    const payload = context.payload as EventPayloads.WebhookPayloadPullRequestReview;
     if (payload.action === "submitted" && payload.review.state === "approved") {
       const pullRequestNumber = payload.pull_request.number;
       info(`Consider merging ${getPullRequestId(pullRequestNumber)}`);
@@ -472,7 +474,7 @@ const autosquash = async ({
       }
     }
   } else if (eventName === "status") {
-    const payload = context.payload as WebhookPayloadStatus;
+    const payload = context.payload as EventPayloads.WebhookPayloadStatus;
     if (payload.state === "success") {
       info(`Merge all pull requests on commit ${payload.sha}`);
       await handleSearchedPullRequests({
