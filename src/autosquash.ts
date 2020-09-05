@@ -33,8 +33,6 @@ type Author = {
   name: string;
 };
 
-const autosquashLabel = "autosquash";
-
 const updateableMergeableStates: MergeableState[] = [
   // When "Require branches to be up to date before merging" is checked
   // and the pull request is missing commits from its base branch,
@@ -53,13 +51,16 @@ const potentialMergeableStates: MergeableState[] = [
 
 const getPullRequestId = (pullRequestNumber: number) => `#${pullRequestNumber}`;
 
-const isCandidate = ({
-  closed_at,
-  labels,
-}: {
-  closed_at: string | null;
-  labels: Array<{ name: string }>;
-}): boolean => {
+const isCandidate = (
+  {
+    closed_at,
+    labels,
+  }: {
+    closed_at: string | null;
+    labels: Array<{ name: string }>;
+  },
+  autosquashLabel: string,
+): boolean => {
   if (closed_at !== null) {
     info("Already merged or closed");
     return false;
@@ -79,9 +80,10 @@ const isCandidateWithMergeableState = (
     labels,
     mergeable_state: actualMergeableState,
   }: PullsGetResponseData,
+  autosquashLabel: string,
   expectedMergeableState: MergeableState[],
 ): boolean => {
-  if (!isCandidate({ closed_at, labels })) {
+  if (!isCandidate({ closed_at, labels }, autosquashLabel)) {
     return false;
   }
 
@@ -152,12 +154,14 @@ const handlePullRequests = async ({
 };
 
 const handleSearchedPullRequests = async ({
+  autosquashLabel,
   github,
   handle,
   owner,
   query,
   repo,
 }: {
+  autosquashLabel: string;
   github: InstanceType<typeof GitHub>;
   handle: (pullRequest: PullsGetResponseData) => Promise<unknown>;
   owner: string;
@@ -182,7 +186,7 @@ const handleSearchedPullRequests = async ({
     await group(
       `Handling searched pull request ${getPullRequestId(item.number)}`,
       async () => {
-        if (isCandidate(item)) {
+        if (isCandidate(item, autosquashLabel)) {
           const pullRequest = await fetchPullRequest({
             github,
             owner,
@@ -348,9 +352,11 @@ const update = async ({
 };
 
 const autosquash = async ({
+  autosquashLabel,
   context,
   github,
 }: {
+  autosquashLabel: string;
   context: Context;
   github: InstanceType<typeof GitHub>;
 }) => {
@@ -379,7 +385,11 @@ const autosquash = async ({
         github,
         async handle(pullRequest) {
           if (
-            isCandidateWithMergeableState(pullRequest, potentialMergeableStates)
+            isCandidateWithMergeableState(
+              pullRequest,
+              autosquashLabel,
+              potentialMergeableStates,
+            )
           ) {
             await merge({
               github,
@@ -404,11 +414,13 @@ const autosquash = async ({
       } = payload;
       info(`Update all relevant pull requests on base ${base}`);
       await handleSearchedPullRequests({
+        autosquashLabel,
         github,
         async handle(pullRequest) {
           if (
             isCandidateWithMergeableState(
               pullRequest,
+              autosquashLabel,
               updateableMergeableStates,
             )
           ) {
@@ -438,7 +450,7 @@ const autosquash = async ({
         repo,
       });
       if (
-        isCandidateWithMergeableState(pullRequest, [
+        isCandidateWithMergeableState(pullRequest, autosquashLabel, [
           ...updateableMergeableStates,
           ...potentialMergeableStates,
         ])
@@ -463,7 +475,11 @@ const autosquash = async ({
         repo,
       });
       if (
-        isCandidateWithMergeableState(pullRequest, potentialMergeableStates)
+        isCandidateWithMergeableState(
+          pullRequest,
+          autosquashLabel,
+          potentialMergeableStates,
+        )
       ) {
         await merge({
           github,
@@ -478,10 +494,15 @@ const autosquash = async ({
     if (payload.state === "success") {
       info(`Merge all pull requests on commit ${payload.sha}`);
       await handleSearchedPullRequests({
+        autosquashLabel,
         github,
         async handle(pullRequest) {
           if (
-            isCandidateWithMergeableState(pullRequest, potentialMergeableStates)
+            isCandidateWithMergeableState(
+              pullRequest,
+              autosquashLabel,
+              potentialMergeableStates,
+            )
           ) {
             const actualHeadSha = pullRequest.head.sha;
             if (actualHeadSha === payload.sha) {
