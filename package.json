@@ -16,7 +16,7 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@actions/core": "^1.2.5",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@octokit/types": "^5.4.1",
     "@octokit/webhooks": "^7.11.2",
