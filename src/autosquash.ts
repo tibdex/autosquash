@@ -1,4 +1,4 @@
-import { error as logError, info, warning, group } from "@actions/core";
+import { info, warning, group } from "@actions/core";
 import { GitHub } from "@actions/github/lib/utils";
 import type { Context } from "@actions/github/lib/context";
 import type { EventPayloads } from "@octokit/webhooks";
@@ -9,6 +9,7 @@ import type {
 import * as assert from "assert";
 import promiseRetry from "promise-retry";
 import { filterBody } from "./filter-body";
+import { handleError } from "./handle-error";
 
 /**
  * See https://developer.github.com/v4/enum/mergestatestatus/
@@ -118,7 +119,7 @@ const fetchPullRequest = async ({
             (pullRequest.mergeable_state as MergeableState) !== "unknown",
         );
         return pullRequest;
-      } catch (error) {
+      } catch (error: unknown) {
         info("Refetching details to know mergeable state");
         return retry(error);
       }
@@ -318,8 +319,8 @@ const merge = async ({
       sha,
     });
     info("Merged!");
-  } catch (error) {
-    logError(error);
+  } catch (error: unknown) {
+    handleError(error);
   }
 };
 
@@ -346,8 +347,8 @@ const update = async ({
       repo,
     });
     info("Updated!");
-  } catch (error) {
-    logError(error);
+  } catch (error: unknown) {
+    handleError(error);
   }
 };
 

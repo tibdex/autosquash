@@ -2,6 +2,7 @@ import { debug, getInput, setFailed } from "@actions/core";
 import { context, getOctokit } from "@actions/github";
 
 import { autosquash } from "./autosquash";
+import { handleError } from "./handle-error";
 
 const run = async () => {
   try {
@@ -10,8 +11,8 @@ const run = async () => {
     debug(JSON.stringify(context, undefined, 2));
     const github = getOctokit(token);
     await autosquash({ autosquashLabel, context, github });
-  } catch (error) {
-    setFailed(error.message);
+  } catch (error: unknown) {
+    handleError(error, setFailed);
   }
 };
 
