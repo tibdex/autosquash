@@ -35,18 +35,14 @@ type Author = {
 };
 
 const updateableMergeableStates: MergeableState[] = [
-  // When "Require branches to be up to date before merging" is checked
-  // and the pull request is missing commits from its base branch,
-  // GitHub will consider its mergeable state to be "behind".
+  // When "Require branches to be up to date before merging" is checked and the pull request is missing commits from its base branch, GitHub will consider its mergeable state to be "behind".
   "behind",
 ];
 
 const potentialMergeableStates: MergeableState[] = [
   "clean",
-  // When checks are running on a pull request,
-  // GitHub considers its mergeable state to be "unstable".
-  // It's what will happen when the Autosquash action is
-  // running so we need to attempt a merge even in that case.
+  // When checks are running on a pull request, GitHub considers its mergeable state to be "unstable".
+  // It's what will happen when the Autosquash action is running so we need to attempt a merge even in that case.
   "unstable",
 ];
 
@@ -254,14 +250,10 @@ const fetchPullRequestCoAuthors = async ({
 };
 
 // Use the pull request body, up to its first thematic break, as the squashed commit message.
-// Indeed, the PR body often contains an interesting description
-// and it's better to avoid the titles of intermediate
-// commits such as "fix CI" or "formatting" being
-// part of the squashed commit message.
+// Indeed, the PR body often contains an interesting description and it's better to avoid the titles of intermediate commits such as "fix CI" or "formatting" being part of the squashed commit message.
 // Also add the authors of commits in the pull request as co-authors of the squashed commit.
 // See https://github.blog/changelog/2019-12-19-improved-attribution-when-squashing-commits/.
-// GitHub only automatically appends the co-author lines when the squashed commit message is
-// left untouched to be the list of the PR's commits title and message.
+// GitHub only automatically appends the co-author lines when the squashed commit message is left untouched to be the list of the PR's commits title and message.
 // But since we change it to be the PR body, we have to append these lines ourself.
 const getSquashedCommitMessage = ({
   body,
