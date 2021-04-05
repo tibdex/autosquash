@@ -15,6 +15,13 @@ Pull requests with the `autosquash` label will be:
   - The creator of the pull request will be the main author of the squashed commit.
     If other people authored commits in the pull request, they will be added as [co-authors](https://github.blog/changelog/2019-12-19-improved-attribution-when-squashing-commits/) of the squashed commit.
 
+# Maintenance update
+
+Focus has shifted to the development of [Auto-update](https://github.com/tibdex/auto-update), the successor of Autosquash.
+
+Indeed, GitHub now supports [pull request auto-merge](https://github.blog/changelog/2021-02-04-pull-request-auto-merge-is-now-generally-available/) out of the box.
+The only thing not taken care of by GitHub (yet) is automatically [updating a pull request when its base branch receives new commits](https://developer.github.com/changes/2019-05-29-update-branch-api/) and that's exactly what [Auto-update](https://github.com/tibdex/auto-update) does.
+
 # Usage
 
 - Add this [.github/workflows/autosquash.yml](.github/workflows/autosquash.yml) to your repository.
